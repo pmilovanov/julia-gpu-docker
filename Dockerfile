@@ -12,11 +12,21 @@ RUN ln -s /opt/julia/bin/julia /usr/local/bin/julia
 
 RUN julia -e 'import Pkg; Pkg.add("CUDA")'
 
-RUN echo Setting up CUDA artifacts
+#RUN echo Setting up CUDA artifacts
 
-COPY artifacts /root/.julia/artifacts/
+#COPY artifacts /root/.julia/artifacts/
 
-RUN ls -l /root/.julia/artifacts
+#RUN ls -l /root/.julia/artifacts
 
+WORKDIR /tmp/artifacts
+COPY artifacts ./
+
+WORKDIR /app
+COPY *.jl /app/
+COPY *.sh /app/
+
+RUN ./ungzip-artifacts.sh
 RUN julia dlartifacts.jl
+RUN rm -rf /app/*
+RUN rm -rf /tmp/artifacts
 
